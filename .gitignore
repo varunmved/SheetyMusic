@@ -1,4 +1,5 @@
 MNIST_data
+data/
 venv/
 *.pyc
 *.swp
