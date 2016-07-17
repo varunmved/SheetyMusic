@@ -23,11 +23,11 @@ training_epochs = 100
 display_step = 10
 
 n_samples = 986135
-X = tf.placeholder(tf.float32, shape=[n_samples, 4], name="features")
+X = tf.placeholder(tf.float32, shape=[n_samples, 5], name="features")
 y = tf.placeholder(tf.float32, shape=[n_samples, 1], name="regressor")
 
-W = tf.Variable(tf.zeros([4, 1]), name="weights")
-b = tf.Variable(np.random.randn(), name="bias")
+W = tf.Variable(tf.zeros([5, 1]), name="weights")
+b = tf.Variable(0.0, name="bias")
 
 pred = tf.add(tf.matmul(X, W), b)
 cost = cost = tf.reduce_sum(tf.pow(pred-y, 2))/(2*n_samples)
@@ -45,12 +45,15 @@ with tf.Session() as sess:
     original = Image.fromarray(np.asarray(image))
     greyscale_img = np.apply_along_axis(np.mean, 2, original)
     
-    train_X = np.ndarray([n_samples, 4])
+    train_X = np.ndarray([n_samples, 5])
     train_Y = np.ndarray([n_samples, 1])
     for epoch in range(training_epochs):
         for w in range(0, 835):
             for h in range(0, 1181):
-                sample_X = np.reshape(np.array([h / 1181.0, w / 835.0, (h / 1181.0)**2, (w / 835.0)**2]), [1, 4])
+                sample_X = np.reshape(np.array([h / 1181.0, w / 835.0, (h / 1181.0) * (w / 835.0),
+                    (w / 835.0)**2,
+                    (h / 1181.0)**2
+                    ]), [1, 5])
                 sample_Y = np.reshape(np.array([greyscale_img[h][w] / 255.0]), [1, 1])
                 
                 # sess.run(optimizer, feed_dict={X: sample_X, y: sample_Y})
@@ -69,8 +72,6 @@ with tf.Session() as sess:
     print("Optimization Finished!")
     training_cost = sess.run(cost, feed_dict={X: train_X, y: train_Y})
     print("Training cost=", training_cost, "W=", sess.run(W), "b=", sess.run(b), '\n')
-
-    pdb.set_trace()
 
     reconstructed_Y = tf.add(tf.matmul(train_X.astype(np.float32), sess.run(W)), sess.run(b)).eval()
     foo = np.reshape(reconstructed_Y * 255, [1181, 835])
