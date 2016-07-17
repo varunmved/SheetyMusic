@@ -22,12 +22,12 @@ sample_img = tf.image.decode_png(v)
 
 # model parameters for the multilayer perceptron
 learning_rate = 0.001
-training_epochs = 100
-display_step = 10
+training_epochs = 10
+display_step = 1
 
-n_hidden_1 = 256     # 1st layer number of features
-n_hidden_2 = 256     # 2nd layer number of features
-n_hidden_3 = 256     # 3rd layer number of features
+n_hidden_1 = 64     # 1st layer number of features
+n_hidden_2 = 64     # 2nd layer number of features
+# n_hidden_3 = 256     # 3rd layer number of features
 n_inputs = 2         # input is the x,y coordinate of a pixel in an image
 n_outputs = 1       # one output, the regressed value. also the number of nodes in final layer
 
@@ -36,20 +36,20 @@ img_width = 835.0
 img_height = 1181.0
 
 # tf Graph input
-X = tf.placeholder(tf.float32, shape=[n_pixels, n_inputs])
-y = tf.placeholder(tf.float32, shape=[n_pixels, n_outputs])
+X = tf.placeholder(tf.float32, shape=[1, n_inputs])
+y = tf.placeholder(tf.float32, shape=[1, n_outputs])
 
 # weights and biases for all the nodes in each layer
 weights = {
     'h1': tf.Variable(tf.random_normal([n_inputs, n_hidden_1])),
     'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
-    'h3': tf.Variable(tf.random_normal([n_hidden_2, n_hidden_3])),
-    'out': tf.Variable(tf.random_normal([n_hidden_3, n_outputs]))
+    # 'h3': tf.Variable(tf.random_normal([n_hidden_2, n_hidden_3])),
+    'out': tf.Variable(tf.random_normal([n_hidden_2, n_outputs]))
     }
 biases = {
     'b1': tf.Variable(tf.zeros([n_hidden_1])),
     'b2': tf.Variable(tf.zeros([n_hidden_2])),
-    'b3': tf.Variable(tf.zeros([n_hidden_3])),
+    # 'b3': tf.Variable(tf.zeros([n_hidden_3])),
     'out': tf.Variable(tf.zeros([n_outputs]))
     }
 
@@ -65,11 +65,11 @@ def multilayer_perceptron(x, weights, biases):
     layer_2 = tf.nn.relu(layer_2)
 
     # Hidden layer 2 with RELU activation
-    layer_3 = tf.add(tf.matmul(layer_2, weights['h3']), biases['b3'])
-    layer_3 = tf.nn.relu(layer_3)
+    # layer_3 = tf.add(tf.matmul(layer_2, weights['h3']), biases['b3'])
+    # layer_3 = tf.nn.relu(layer_3)
 
     # Output layer with linear activation
-    out_layer = tf.matmul(layer_3, weights['out']) + biases['out']
+    out_layer = tf.matmul(layer_2, weights['out']) + biases['out']
     return out_layer
 
 
@@ -109,8 +109,13 @@ def main():
                     sample_Y = np.reshape(np.array([greyscale_img[h][w] / 255.0]), [1, 1])
                     train_X[w * int(img_height) + h] = sample_X
                     train_Y[w * int(img_height) + h] = sample_Y
-            
-            _, total_cost = sess.run([optimizer, cost], feed_dict={X: train_X, y: train_Y})
+                    _, c = sess.run([optimizer, cost], feed_dict={X: sample_X, y: sample_Y})
+                    total_cost += c
+                    if ((w * int(img_height) + h) + 1) % 1000 == 0:
+                        print("epoch %s, pixel %s, total_cost: %s" % (epoch + 1,
+                            w * int(img_height) + h + 1, total_cost))
+
+            # _, total_cost = sess.run([optimizer, cost], feed_dict={X: train_X, y: train_Y})
             # Display logs per epoch step
             if (epoch+1) % display_step == 0:
                 print("Epoch:", '%04d' % (epoch+1), "cost=", "{:.9f}".format(total_cost))
