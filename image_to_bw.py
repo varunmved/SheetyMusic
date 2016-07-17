@@ -24,6 +24,8 @@ with tf.Session() as sess:
     # the original image with all color channels
     original = Image.fromarray(np.asarray(image))
     original.show()
+    
+    pdb.set_trace()
 
     # take the average of all 3 color channels to flatten the color dimension
     greyscale_img = np.apply_along_axis(np.mean, 2, original)
