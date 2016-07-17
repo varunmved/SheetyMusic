@@ -23,11 +23,11 @@ sample_img = tf.image.decode_png(v)
 # model parameters for the multilayer perceptron
 learning_rate = 0.001
 training_epochs = 100
-display_step = 1
+display_step = 10
 
-n_hidden_1 = 64     # 1st layer number of features
-n_hidden_2 = 64     # 2nd layer number of features
-n_hidden_3 = 64     # 3rd layer number of features
+n_hidden_1 = 256     # 1st layer number of features
+n_hidden_2 = 256     # 2nd layer number of features
+n_hidden_3 = 256     # 3rd layer number of features
 n_inputs = 2         # input is the x,y coordinate of a pixel in an image
 n_outputs = 1       # one output, the regressed value. also the number of nodes in final layer
 
@@ -36,8 +36,8 @@ img_width = 835.0
 img_height = 1181.0
 
 # tf Graph input
-X = tf.placeholder(tf.float32, [n_pixels, n_inputs])
-y = tf.placeholder(tf.float32, [n_pixels, n_outputs])
+X = tf.placeholder(tf.float32, shape=[n_pixels, n_inputs])
+y = tf.placeholder(tf.float32, shape=[n_pixels, n_outputs])
 
 # weights and biases for all the nodes in each layer
 weights = {
@@ -99,7 +99,7 @@ def main():
         
         for epoch in range(training_epochs):
             total_cost = 0
-            last_cost = np.Infinity
+            last_cost = np.finfo(1.0).max
             for w in range(0, int(img_width)):
                 for h in range(0, int(img_height)):
                     sample_X = np.reshape(
@@ -115,8 +115,8 @@ def main():
             if (epoch+1) % display_step == 0:
                 print("Epoch:", '%04d' % (epoch+1), "cost=", "{:.9f}".format(total_cost))
         
-            if total_cost > last_cost: break
-            else: last_cost = total_cost
+            # if total_cost > last_cost or abs(total_cost - last_cost) / last_cost < .10: break
+            # else: last_cost = total_cost
         
         pdb.set_trace()
         print("Optimization Finished!")

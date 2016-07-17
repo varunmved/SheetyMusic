@@ -74,7 +74,7 @@ with tf.Session() as sess:
     print("Training cost=", training_cost, "W=", sess.run(W), "b=", sess.run(b), '\n')
 
     reconstructed_Y = tf.add(tf.matmul(train_X.astype(np.float32), sess.run(W)), sess.run(b)).eval()
-    foo = np.reshape(reconstructed_Y * 255, [1181, 835])
+    foo = np.reshape(reconstructed_Y * 255, [1181, 835], order="F")
     Image.fromarray(np.asarray(foo)).show()
     original.show()
 
