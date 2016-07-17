@@ -22,12 +22,12 @@ sample_img = tf.image.decode_png(v)
 
 # model parameters for the multilayer perceptron
 learning_rate = 0.001
-training_epochs = 10
+training_epochs = 100
 display_step = 1
 
-n_hidden_1 = 128     # 1st layer number of features
-n_hidden_2 = 128     # 2nd layer number of features
-n_hidden_3 = 128     # 3rd layer number of features
+n_hidden_1 = 64     # 1st layer number of features
+n_hidden_2 = 64     # 2nd layer number of features
+n_hidden_3 = 64     # 3rd layer number of features
 n_inputs = 2         # input is the x,y coordinate of a pixel in an image
 n_outputs = 1       # one output, the regressed value. also the number of nodes in final layer
 
@@ -99,23 +99,24 @@ def main():
         
         for epoch in range(training_epochs):
             total_cost = 0
+            last_cost = np.Infinity
             for w in range(0, int(img_width)):
                 for h in range(0, int(img_height)):
                     sample_X = np.reshape(
-                            np.array([w / img_width, h / img_height]),
+                            np.array([h / img_height, w / img_width]),
                             [1, n_inputs]
                             )
                     sample_Y = np.reshape(np.array([greyscale_img[h][w] / 255.0]), [1, 1])
-                    train_X[w * int(img_width) + h] = sample_X
-                    train_Y[w * int(img_width) + h] = sample_Y
-                    # _, c = sess.run([optimizer, cost], feed_dict={X: sample_X, y: sample_Y})
-                    # print("%s, %s -- %f" % (w, h, c))
-                    # total_cost += c
-
+                    train_X[w * int(img_height) + h] = sample_X
+                    train_Y[w * int(img_height) + h] = sample_Y
+            
             _, total_cost = sess.run([optimizer, cost], feed_dict={X: train_X, y: train_Y})
             # Display logs per epoch step
             if (epoch+1) % display_step == 0:
                 print("Epoch:", '%04d' % (epoch+1), "cost=", "{:.9f}".format(total_cost))
+        
+            if total_cost > last_cost: break
+            else: last_cost = total_cost
         
         pdb.set_trace()
         print("Optimization Finished!")

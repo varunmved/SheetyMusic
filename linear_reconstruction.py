@@ -19,8 +19,8 @@ my_img = tf.image.decode_png(v)
 
 # configure our linear regression model
 learning_rate = 0.01
-training_epochs = 100
-display_step = 10
+training_epochs = 10
+display_step = 1
 
 n_samples = 986135
 X = tf.placeholder(tf.float32, shape=[n_samples, 5], name="features")
@@ -57,8 +57,8 @@ with tf.Session() as sess:
                 sample_Y = np.reshape(np.array([greyscale_img[h][w] / 255.0]), [1, 1])
                 
                 # sess.run(optimizer, feed_dict={X: sample_X, y: sample_Y})
-                train_X[w * 835 + h] = sample_X
-                train_Y[w * 835 + h] = sample_Y
+                train_X[w * 1181 + h] = sample_X
+                train_Y[w * 1181 + h] = sample_Y
 
         sess.run(optimizer, feed_dict={X: train_X, y: train_Y})
 
